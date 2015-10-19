@@ -27,23 +27,29 @@ import java.util.Arrays;
 
      public class SalesTaxes 
      {
+    	 public static File inputfile;
+    	 public static File outputfile;
+    	 public static DecimalFormat decim = new DecimalFormat("0.00");
+    	 
          public static void main (String[] args) throws IOException
          {        	 
-        	 PrintReceipt("/Users/lababib/Documents/eclipsecode/ThoughtWorks/src/example1.txt");
-        	 PrintReceipt("/Users/lababib/Documents/eclipsecode/ThoughtWorks/src/example2.txt");
-        	 PrintReceipt("/Users/lababib/Documents/eclipsecode/ThoughtWorks/src/example3.txt");
+        	 inputfile = new File(args[0]);
+        	 outputfile = new File(args[1]);
+        	 TestPrintReceipt(inputfile, outputfile);
          }
          
-         public static void PrintReceipt (String textfilename) throws FileNotFoundException, IOException 
+         public static void TestPrintReceipt(File textfile, File output) throws FileNotFoundException, IOException
          {
+        	 FileWriter writer = new FileWriter(output, true);
+        	 
         	 String line;
              BufferedReader in;
              Double alltaxes = 0.0;
              Double allprices = 0.0;
-             DecimalFormat decim = new DecimalFormat("0.00");
+             
              //store names and prices
              //open the file
-             in = new BufferedReader(new FileReader(textfilename));
+             in = new BufferedReader(new FileReader(textfile));
              line = in.readLine();
              //read the file
              while(line != null)
@@ -85,48 +91,96 @@ import java.util.Arrays;
         	 		if (regularTax == true)
         	 		{
         	 			//sales tax = np/100 rounded up to the nearest 0.05
-        	 			//System.out.println(name);
-        	 			double tax = .10 * price;
-        	 			//tax = tax/100;
-						taxes = taxes + tax;
+        	 			double tax = 10 * price/100;
+        	 			tax = roundtonearestpointfive(tax);
+        	 			taxes = taxes + tax;
 						
         	 		}
         	 		
         	 		//if imported, additional 5% sales tax
-        	 		//if not food, medicine, books, 10% regular sales tax
         	 		if (importTax == true)
         	 		{
         	 			//sales tax = np/100 rounded up to the nearest 0.05
-        	 			//System.out.println(name);
-        	 			double tax = .05 * price;
-        	 			//tax = tax/100;
+        	 			double tax = 5 * price/100;
+        	 			tax = roundtonearestpointfive(tax);
 						taxes = taxes + tax;
         	 		}
         	 	
+        	 		//add taxes + price
+        	 		double total = price + taxes;
         	 		
-        	 		double roundedto5 = Math.round(taxes * 20.0) / 20.0;
-        	 		double total = price + roundedto5;
-        	 		total = Math.round(total * 100.0) / 100.0;
-        	 		
-        	 		//ensuring we have trailing zeros
+        	 		//ensuring we have trailing zeros in the printing
         	 		String stotal = decim.format(total);
+        	 		writer.write(quantity + name + ": " + stotal + "\n");
             	 	System.out.println(quantity + name + ": " + stotal);
             	 	
             	 	alltaxes += taxes;
             	 	allprices += price + taxes;
                     line = in.readLine();
              }
-             //ensuring we have trailing zeros
-             alltaxes = Math.round(alltaxes * 100.0) / 100.0;
-             allprices = Math.round(allprices * 100.0) / 100.0;             
+             //ensuring we have trailing zeros in the printing        
              String salltaxes = decim.format(alltaxes);
              String sallprices = decim.format(allprices);
 	 		 
+             writer.write("Sales Taxes: " + salltaxes + "\n");
              System.out.println("Sales Taxes: " + salltaxes);
-             System.out.println("Total: " + sallprices);
-             System.out.println();
+             writer.write("Total: " + sallprices);
+     	 	 System.out.println("Total: " + sallprices);
+     	 	 System.out.println();
+             writer.close();
              in.close();
-
          }
+         
+         public static double roundtonearestpointfive(double num) {
+//        	 System.out.println(num);
+        	 
+        	 //creating the initial two places double
+        	 String test = Double.toString(num);
+        	 test += "00";
+        	 String copy = test.substring(0, test.indexOf('.') + 3);
 
+        	 //getting the last of the current and the next
+        	 num = Double.parseDouble(copy);
+        	 test = Double.toString(num);
+        	 char last = copy.charAt(copy.length() - 1);        	 
+        	 char next = copy.charAt(copy.length() - 2);
+        	 Double dnext = Double.parseDouble(String.valueOf(next)) + 1;
+        	 String snext = String.valueOf(dnext);
+        	 char cnext = snext.charAt(0);
+        	 next = cnext;
+        	 
+        	 char[] temp = copy.toCharArray();
+        	 switch (last) {
+        	 case '0':
+        		 break;
+        		 
+        	 case '1':
+        	 case '2':
+        	 case '3':
+        	 case '4':
+        		 temp[copy.length() - 1] = '5';
+        		 break;
+        		 
+        	 case '5':
+        		 break;
+        		 
+        	 case '6':
+        	 case '7':
+        	 case '8':
+        	 case '9':
+        		 temp[copy.length() - 2] = next;
+        		 temp[copy.length() - 1] = '0';
+        		 break;
+        	 }
+        	 String result = "";
+        	 for (int i = 0; i < temp.length; i++) {
+        		 result += String.valueOf(temp[i]);
+        	 }
+        		 
+        	 num = Double.parseDouble(result);
+//        	 System.out.println(num);
+//        	 System.out.println("done");
+        	 return num;
+         }
+        
     }
