@@ -35,10 +35,10 @@ import java.util.Arrays;
          {        	 
         	 inputfile = new File(args[0]);
         	 outputfile = new File(args[1]);
-        	 TestPrintReceipt(inputfile, outputfile);
+        	 PrintReceipt(inputfile, outputfile);
          }
          
-         public static void TestPrintReceipt(File textfile, File output) throws FileNotFoundException, IOException
+         public static void PrintReceipt(File textfile, File output) throws FileNotFoundException, IOException
          {
         	 FileWriter writer = new FileWriter(output, true);
         	 
@@ -132,8 +132,6 @@ import java.util.Arrays;
          }
          
          public static double roundtonearestpointfive(double num) {
-//        	 System.out.println(num);
-        	 
         	 //creating the initial two places double
         	 String test = Double.toString(num);
         	 test += "00";
@@ -178,8 +176,6 @@ import java.util.Arrays;
         	 }
         		 
         	 num = Double.parseDouble(result);
-//        	 System.out.println(num);
-//        	 System.out.println("done");
         	 return num;
          }
         
